@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,41 +8,65 @@
 </head>
 <body>
     <div class="container">
-        <h1> Generate a random password</h1>
+        <h1>ランダムパスワード生成</h1>
         <div class="display">
-            <input type="text" id="password" placeholder="Password">
-            <img src = "images/copy.png">
+            <input type="text" id="password" placeholder="Password" readonly>
+            <button class="copy-btn" id="copyBtn" title="コピー"><span>📋</span></button>
         </div>
-        <button onclick = "createPassword()"><img src="images/generate.png">Generate password</button>
+        <button class="generate-btn" onclick="createPassword()"><span>🔄</span>生成</button>
+        <div class="options">
+            <label class="range-label">
+                長さ
+                <input type="range" id="lengthRange" min="6" max="32" value="12" oninput="lengthValue.textContent = lengthRange.value">
+                <span id="lengthValue">12</span>
+            </label>
+            <label class="checkbox-label"><input type="checkbox" id="useUpper" checked><span>英大文字</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="useLower" checked><span>英小文字</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="useNumber" checked><span>数字</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="useSymbol"><span>記号</span></label>
+        </div>
     </div>
-
-
-
 <script>
-    const password = document.getElementById("password");
-    const length = 12;
-    const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const lowerCase = "abcdefghijklmnopqrstuvwxyz";
-    const numbers = "0123456789";
-    const symbols = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
+const password = document.getElementById("password");
+const lengthRange = document.getElementById("lengthRange");
+const lengthValue = document.getElementById("lengthValue");
+const useUpper = document.getElementById("useUpper");
+const useLower = document.getElementById("useLower");
+const useNumber = document.getElementById("useNumber");
+const useSymbol = document.getElementById("useSymbol");
+const copyBtn = document.getElementById("copyBtn");
 
-    const allChars = upperCase + lowerCase + numbers + symbols;
+const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const lowerCase = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
 
 function createPassword(){
+    let chars = "";
+    if(useUpper.checked) chars += upperCase;
+    if(useLower.checked) chars += lowerCase;
+    if(useNumber.checked) chars += numbers;
+    if(useSymbol.checked) chars += symbols;
+
+    if(chars === "") {
+        password.value = "条件を選択してください";
+        return;
+    }
+
     let pwd = "";
-    pwd += upperCase[Math.floor(Math.random() * upperCase.length)];
-    pwd += lowerCase[Math.floor(Math.random() * lowerCase.length)];
-    pwd += numbers[Math.floor(Math.random() * numbers.length)];
-    pwd += symbols[Math.floor(Math.random() * symbols.length)];
-    
-    while(length > pwd.length){
-        pwd += allChars[Math.floor(Math.random() * allChars.length)];
+    for(let i=0; i<lengthRange.value; i++){
+        pwd += chars[Math.floor(Math.random() * chars.length)];
     }
     password.value = pwd;
 }
 
-
-     
+copyBtn.onclick = function() {
+    if(password.value && password.value !== "条件を選択してください") {
+        navigator.clipboard.writeText(password.value);
+        copyBtn.classList.add("copied");
+        setTimeout(() => copyBtn.classList.remove("copied"), 1000);
+    }
+};
 </script>
 </body>
 </html>
